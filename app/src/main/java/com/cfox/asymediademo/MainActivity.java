@@ -15,6 +15,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void crateObj(View view) {
-
+        ((AppApplication)getApplication()).asy();
     }
 }

@@ -4,21 +4,25 @@ import android.app.Application;
 
 import com.cfox.asymediademo.db.LocalDatabaseControl;
 import com.cfox.asymediademo.db.LocalMediaInfo;
-import com.cfox.asymediademo.db.core.AsyMediaDatabase;
-import com.cfox.asymediademo.db.core.CheckRule;
-import com.cfox.asymediademo.db.core.MediaFactory;
-import com.cfox.asymediademo.db.core.MediaInfo;
+import com.cfox.asymedialib.AsyMediaDatabase;
+import com.cfox.asymedialib.core.CheckRule;
+import com.cfox.asymedialib.core.MediaInfoFactory;
+import com.cfox.asymedialib.core.MediaInfo;
 
 
 public class AppApplication extends Application {
+
+    private AsyMediaDatabase amd;
+
     @Override
     public void onCreate() {
         super.onCreate();
-        AsyMediaDatabase amd = AsyMediaDatabase
+//        AsyConfig.isDebug = true;
+        amd = AsyMediaDatabase
                 .create(this)
-                .setMediaFactory(new MediaFactory<LocalMediaInfo>() {
+                .setMediaInfoFactory(new MediaInfoFactory<LocalMediaInfo>() {
                     @Override
-                    public LocalMediaInfo createLocalMediaInfo() {
+                    public LocalMediaInfo createMediaInfo() {
                         return new LocalMediaInfo();
                     }
                 })
@@ -28,10 +32,16 @@ public class AppApplication extends Application {
                     public boolean checkUpdate(LocalMediaInfo localBean, MediaInfo mediaInfo) {
                         return false;
                     }
-                }).build();
+                })
+                .setQueryOnceRowNumber(10)
+                .setFilterMinImageSize(0)
+                .build();
 
-        amd.asyMedia();
         amd.register();
 
+    }
+
+    public void asy() {
+        amd.asyMedia();
     }
 }

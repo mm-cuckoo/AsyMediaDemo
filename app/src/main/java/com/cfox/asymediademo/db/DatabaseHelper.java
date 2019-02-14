@@ -40,32 +40,9 @@ public class DatabaseHelper extends SQLiteOpenHelper implements IMediaDbData {
                 TYPE + " INTEGER NOT NULL," +
                 HIDDEN + " INTEGER NOT NULL)");
 
-        db.execSQL("CREATE TABLE " + TABLE_VIDEO_PLAN + " (" +
-                ID + " INTEGER PRIMARY KEY AUTOINCREMENT , " +
-                FILE_ID + " INTEGER NOT NULL," +
-                START_TIME + " INTEGER NOT NULL," +
-                STOP_TIME + " NOT NULL)");
-
-        db.execSQL("CREATE TABLE " + TABLE_IMAGE_PLAN + " (" +
-                ID + " INTEGER PRIMARY KEY AUTOINCREMENT , " +
-                FILE_ID + " INTEGER NOT NULL)");
-
-        db.execSQL("CREATE TABLE " + TABLE_VIDEO_GENERATE_PLAN + " (" +
-                ID + " INTEGER PRIMARY KEY AUTOINCREMENT , " +
-                GENERATE_ID + " INTEGER NOT NULL," +
-                PLAN_ID + " INTEGER NOT NULL, " +
-                PRIORITY + " INTEGER NOT NULL," +
-                TYPE + " INTEGER NOT NULL)");
-
-        db.execSQL("CREATE TABLE " + TABLE_VIDEO_GENERATE + " (" +
-                ID + " INTEGER PRIMARY KEY AUTOINCREMENT , " +
-                NAME + " INTEGER NOT NULL, " +
-                CRATE_TIME + " INTEGER NOT NULL)");
     }
 
     private void createView(SQLiteDatabase db) {
-        db.execSQL("CREATE VIEW video_plan_view AS SELECT vp.start_time , vp.stop_time , f.file_path , " +
-                "f.type FROM files f, video_plan vp WHERE f.id = vp.file_id");
     }
 
     public static int getDatabaseVersion(Context context) {
