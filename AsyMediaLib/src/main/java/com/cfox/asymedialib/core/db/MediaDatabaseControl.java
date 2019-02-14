@@ -25,7 +25,7 @@ public class MediaDatabaseControl extends AbsMDatabaseControl<MediaInfo> {
     public CursorWrapper queryImageToCursor(Context context, int startId, int rowNum) {
         String where = MediaStore.Images.Media.MIME_TYPE + " LIKE ? ";
         String[] whereArgs = {"image/%"};
-        String sortOrder = MediaStore.MediaColumns._ID + " ASC";
+        String sortOrder = MediaStore.MediaColumns._ID + " ASC  LIMIT " + rowNum;
         return baseQuery(context, where, whereArgs, sortOrder);
     }
 
@@ -33,7 +33,7 @@ public class MediaDatabaseControl extends AbsMDatabaseControl<MediaInfo> {
     public CursorWrapper queryVideoToCursor(Context context, int startId, int rowNum) {
         String where = MediaStore.Video.Media.MIME_TYPE + " LIKE ? ";
         String[] whereArgs = {"video/%"};
-        String sortOrder = MediaStore.MediaColumns._ID + " ASC";
+        String sortOrder = MediaStore.MediaColumns._ID + " ASC  LIMIT " + rowNum;
         return baseQuery(context, where, whereArgs, sortOrder);
     }
 
@@ -50,6 +50,11 @@ public class MediaDatabaseControl extends AbsMDatabaseControl<MediaInfo> {
     @Override
     public int getMediaId(CursorWrapper cursorWrapper) {
         return cursorWrapper.cursor.getInt(cursorWrapper.cursor.getColumnIndexOrThrow(MediaStore.MediaColumns._ID));
+    }
+
+    @Override
+    public MediaInfo createMediaInfo() {
+        return new MediaInfo();
     }
 
     @Override
@@ -96,7 +101,7 @@ public class MediaDatabaseControl extends AbsMDatabaseControl<MediaInfo> {
         folder = folder.substring(folder.lastIndexOf("/") + 1, folder.length());
         mediaInfo.setFolder(folder);
         if(AsyConfig.isDebug) {
-            Log.d(TAG, "cursorToMediaBean >>> MediaInfo"  + mediaInfo.toString());
+            Log.d(TAG, "cursorToMediaBean >>> MediaInfo:"  + mediaInfo.toString());
         }
         return mediaInfo;
     }

@@ -2,37 +2,36 @@ package com.cfox.asymedialib;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.util.Log;
 
 import com.cfox.asymedialib.core.db.AbsUDatabaseControl;
 import com.cfox.asymedialib.core.CheckRule;
 import com.cfox.asymedialib.core.DatabaseSyncHandler;
 import com.cfox.asymedialib.core.MediaCheckRule;
-import com.cfox.asymedialib.core.MediaInfoFactory;
-import com.cfox.asymedialib.core.MediaInfo;
 import com.cfox.asymedialib.core.MediaObserver;
 import com.cfox.asymedialib.core.db.MediaDatabaseControl;
 
 public class AsyMediaDatabase {
-    Context mContext;
+    private static final String TAG = "AsyMediaDatabase";
+    private Context mContext;
     private DatabaseSyncHandler mDBSyncHandler;
 
     AsyMediaDatabase(Build build) {
         this.mContext = build.context;
         AsyConfig config = AsyConfig.getInstance();
         config.mContext = build.context;
-
-        config.mMediaInfoFactory = new MediaInfoFactory() {
-            @Override
-            public MediaInfo createMediaInfo() {
-                return new MediaInfo();
-            }
-        };
-        config.mMediaInfoFactory = build.mLocalMediaInfoFactory != null ? build.mLocalMediaInfoFactory : config.mMediaInfoFactory;
         config.mMDatabaseControl = new MediaDatabaseControl();
         config.mUDatabaseControl =  build.mUDatabaseControl;
         config.checkRule = build.mCheckRule != null ? build.mCheckRule : new MediaCheckRule();
         config.mFilterMinImageSize = build.mFilterMinImageSize;
         config.mQueryOnceRowNumber = build.mQueryOnceRowNumber;
+        config.mCacheSizeInsert = build.mCacheSizeInsert;
+        config.mCacheSizeUpdate = build.mCacheSizeUpdate;
+        config.mCacheSizeDelete = build.mCacheSizeDelete;
+
+        if(AsyConfig.isDebug) {
+            Log.d(TAG, "AsyMedia db lib config :" + config.toString());
+        }
 
         mDBSyncHandler = new DatabaseSyncHandler(mContext);
         // 设置config , 启动成
@@ -50,19 +49,16 @@ public class AsyMediaDatabase {
 
     public static class Build {
         private Context context;
-        private MediaInfoFactory mLocalMediaInfoFactory;
         private AbsUDatabaseControl mUDatabaseControl;
         private CheckRule mCheckRule;
         private int mQueryOnceRowNumber = 1000;
         private int mFilterMinImageSize = 1024;
+        private int mCacheSizeInsert = 100;
+        private int mCacheSizeUpdate = 100;
+        private int mCacheSizeDelete = 100;
 
         public Build(Context context) {
             this.context = context.getApplicationContext();
-        }
-
-        public Build setMediaInfoFactory(MediaInfoFactory mediaInfoFactory) {
-            this.mLocalMediaInfoFactory = mediaInfoFactory;
-            return this;
         }
 
         public Build setUDatabaseControl(AbsUDatabaseControl UDatabaseControl) {
@@ -82,6 +78,21 @@ public class AsyMediaDatabase {
 
         public Build setFilterMinImageSize(int mFilterMinImageSize) {
             this.mFilterMinImageSize = mFilterMinImageSize;
+            return this;
+        }
+
+        public Build setCacheSizeInsert(int mCacheSizeInsert) {
+            this.mCacheSizeInsert = mCacheSizeInsert;
+            return this;
+        }
+
+        public Build setCacheSizeUpdate(int mCacheSizeUpdate) {
+            this.mCacheSizeUpdate = mCacheSizeUpdate;
+            return this;
+        }
+
+        public Build setCacheSizeDelete(int mCacheSizeDelete) {
+            this.mCacheSizeDelete = mCacheSizeDelete;
             return this;
         }
 

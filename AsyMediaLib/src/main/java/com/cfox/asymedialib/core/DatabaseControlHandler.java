@@ -10,19 +10,14 @@ import android.util.Log;
 import com.cfox.asymedialib.AsyConfig;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class DatabaseControlHandler {
     private static final String TAG = "DatabaseControlHandler";
 
-    private static final int INSERT_STACK_SIZE = 100;
-
-    private static final int UPDATE_STACK_SIZE = 100;
-    private static final int DELETE_STACK_SIZE = 100;
-
-
     public static final String KEY_FLAG           = "key_flag";
+
+
     public static final String KEY_VALUE          = "key_value";
     public static final int FLAG_FLUSH_DELAY      = 0;
     public static final int FLAG_INSERT_NOW       = 1;
@@ -33,9 +28,13 @@ public class DatabaseControlHandler {
     private Context mContext;
     private Handler mHandler;
 
-    private List<MediaInfo> inserts = new ArrayList<>(INSERT_STACK_SIZE);
-    private List<MediaInfo> updates = new ArrayList<>(UPDATE_STACK_SIZE);
-    private List<MediaInfo> deletes = new ArrayList<>(DELETE_STACK_SIZE);
+    private int mInsertStackSize;
+    private int mUpdateStackSize;
+    private int mDeleteStackSize;
+
+    private List<MediaInfo> mInserts = new ArrayList<>();
+    private List<MediaInfo> mUpdates = new ArrayList<>();
+    private List<MediaInfo> mDeletes = new ArrayList<>();
 
     public Handler getHandler () {
         return mHandler;
@@ -43,6 +42,7 @@ public class DatabaseControlHandler {
 
     public DatabaseControlHandler(Context context) {
         mContext = context.getApplicationContext();
+        initCacheSize();
         HandlerThread thread = new HandlerThread("db_control_handler");
         thread.start();
         mHandler = new Handler(thread.getLooper()) {
@@ -51,6 +51,12 @@ public class DatabaseControlHandler {
                 dispatchMsg((Bundle) msg.obj);
             }
         };
+    }
+
+    private void initCacheSize() {
+        mInsertStackSize = AsyConfig.getInstance().mCacheSizeInsert;
+        mUpdateStackSize = AsyConfig.getInstance().mCacheSizeUpdate;
+        mDeleteStackSize = AsyConfig.getInstance().mCacheSizeDelete;
     }
 
     public void postMsg(Bundle bundle) {
@@ -64,32 +70,42 @@ public class DatabaseControlHandler {
     private void dispatchMsg(Bundle obj) {
 
         int flag = obj.getInt(KEY_FLAG, -1);
-        MediaInfo bean = null;
+        if(AsyConfig.isDebug) {
+            Log.d(TAG, "get flag:" + flag);
+        }
+        MediaInfo info = null;
         if (flag > 0) {
-            bean = obj.getParcelable(KEY_VALUE);
+            info = obj.getParcelable(KEY_VALUE);
+            if(AsyConfig.isDebug) {
+                Log.d(TAG, "get info:" + info);
+            }
         }
 
         switch (flag) {
             case FLAG_INSERT_NOW:
-                insertNow(bean);
+                insertNow(info);
                 break;
 
             case FLAG_INSERT_DELAY:
-                inserts.add(bean);
+                mInserts.add(info);
                 flushInsertDelay(false);
                 break;
 
             case FLAG_UPDATE_DELAY:
-                updates.add(bean);
+                mUpdates.add(info);
                 flushUpdateDelay(false);
                 break;
 
             case FLAG_DELETE_DELAY:
-                deletes.add(bean);
+                mDeletes.add(info);
                 flushDeleteDelay(false);
                 break;
 
             case FLAG_FLUSH_DELAY:
+                if(AsyConfig.isDebug) {
+                    Log.d(TAG, ">>>>>>: flush delay data ");
+                }
+
                 flushInsertDelay(true);
                 flushUpdateDelay(true);
                 flushDeleteDelay(true);
@@ -99,23 +115,37 @@ public class DatabaseControlHandler {
     }
 
     private void flushDeleteDelay(boolean isFlush) {
-        if (deletes.size() > 0 && (isFlush || deletes.size() >= DELETE_STACK_SIZE)) {
-            AsyConfig.getInstance().mUDatabaseControl.deleteForList(mContext, deletes);
-            deletes.clear();
+        if(AsyConfig.isDebug) {
+            Log.d(TAG, "delete size:" + mDeletes.size());
+            Log.d(TAG, "mDeletes:" + mDeletes.toString());
+        }
+
+        if (mDeletes.size() > 0 && (isFlush || mDeletes.size() >= mDeleteStackSize)) {
+            AsyConfig.getInstance().mUDatabaseControl.deleteForList(mContext, mDeletes);
+            mDeletes.clear();
         }
     }
 
     private void flushUpdateDelay(boolean isFlush) {
-        if (updates.size() > 0 && (isFlush || updates.size() >= UPDATE_STACK_SIZE)) {
-            AsyConfig.getInstance().mUDatabaseControl.updateForList(mContext, updates);
-            updates.clear();
+        if(AsyConfig.isDebug) {
+            Log.d(TAG, "update size:" + mUpdates.size());
+            Log.d(TAG, "updates:" + mUpdates.toString());
+        }
+
+        if (mUpdates.size() > 0 && (isFlush || mUpdates.size() >= mUpdateStackSize)) {
+            AsyConfig.getInstance().mUDatabaseControl.updateForList(mContext, mUpdates);
+            mUpdates.clear();
         }
     }
 
     private void flushInsertDelay(boolean isFlush) {
-        if (inserts.size() > 0 && (isFlush || inserts.size() >= INSERT_STACK_SIZE)) {
-            AsyConfig.getInstance().mUDatabaseControl.insertForList(mContext, inserts);
-            inserts.clear();
+        if(AsyConfig.isDebug) {
+            Log.d(TAG, "insert size:" + mInserts.size());
+            Log.d(TAG, "inserts:" + mInserts.toString());
+        }
+        if (mInserts.size() > 0 && (isFlush || mInserts.size() >= mInsertStackSize)) {
+            AsyConfig.getInstance().mUDatabaseControl.insertForList(mContext, mInserts);
+            mInserts.clear();
         }
     }
 

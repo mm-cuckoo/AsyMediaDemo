@@ -9,11 +9,8 @@ public class DatabaseHelper extends SQLiteOpenHelper implements IMediaDbData {
 
     private static final String DB_NAME = "fve_db";
 
-    private Context mContext;
-
     public DatabaseHelper(Context context) {
         super(context, DB_NAME, null, getDatabaseVersion(context));
-        mContext = context;
     }
 
     @Override
@@ -39,10 +36,10 @@ public class DatabaseHelper extends SQLiteOpenHelper implements IMediaDbData {
                 MEDIA_ID + "  INTEGER UNIQUE NOT NULL," +
                 TYPE + " INTEGER NOT NULL," +
                 HIDDEN + " INTEGER NOT NULL)");
-
     }
 
     private void createView(SQLiteDatabase db) {
+
     }
 
     public static int getDatabaseVersion(Context context) {

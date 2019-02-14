@@ -41,11 +41,11 @@ public class CheckEngine {
 
         if (mLocalCursor != null) {
             mLocalMediaInfo = mAsyConfig.mUDatabaseControl.cursorToMediaBean(mLocalCursor.cursor,
-                    mAsyConfig.mLocalMediaInfoFactory.createMediaInfo());
+                    mAsyConfig.mUDatabaseControl.createMediaInfo());
         }
         if (mMediaCursor != null){
             mMediaInfo = mAsyConfig.mMDatabaseControl.cursorToMediaBean(mMediaCursor.cursor,
-                    mAsyConfig.mMediaInfoFactory.createMediaInfo());
+                    mAsyConfig.mMDatabaseControl.createMediaInfo());
         }
 
         while (true) {
@@ -87,14 +87,21 @@ public class CheckEngine {
             mediaId = mediaInfo.getMediaId();
         }
 
+        if(AsyConfig.isDebug) {
+            Log.e(TAG, "checkCursor: \n localInfo:" + localInfo  + "\n mediaInfo:" + mediaInfo);
+            Log.d(TAG, "checkCursor: media id:" + mediaId);
+            Log.d(TAG, "checkCursor: local media id:" + localMediaId);
+        }
+
         if (localMediaId == mediaId) {
             //check update
-            if (!checkUpdate(localInfo, mediaInfo)) {
+            if (checkUpdate(localInfo, mediaInfo)) {
                 postBundle(mediaInfo, DatabaseControlHandler.FLAG_UPDATE_DELAY);
             }
             return TYPE_MOVE_ALL;
         }
         if (mediaId == -1) {
+            postBundle(localInfo, DatabaseControlHandler.FLAG_DELETE_DELAY);
             return TYPE_MEDIA_NO_NEXT;
         }
 
@@ -106,13 +113,13 @@ public class CheckEngine {
         if (localMediaId < mediaId) {
             //delete form local
             postBundle(localInfo, DatabaseControlHandler.FLAG_DELETE_DELAY);
-            return TYPE_MEDIA_NEXT;
+            return TYPE_LOCAL_NEXT;
         }
         // insert media to local
         // local id = -1 or local id > media id
 
         postBundle(mediaInfo, DatabaseControlHandler.FLAG_INSERT_DELAY);
-        return TYPE_LOCAL_NEXT;
+        return TYPE_MEDIA_NEXT;
 
     }
 
@@ -130,7 +137,7 @@ public class CheckEngine {
             return;
         }
         mMediaInfo = mAsyConfig.mMDatabaseControl.cursorToMediaBean(mMediaCursor.cursor,
-                mAsyConfig.mMediaInfoFactory.createMediaInfo());
+                mAsyConfig.mMDatabaseControl.createMediaInfo());
     }
 
     private void localCursorNext(LocalMediaEngine localMediaEngine) {
@@ -139,8 +146,8 @@ public class CheckEngine {
             mLocalMediaInfo = null;
             return;
         }
-        mAsyConfig.mUDatabaseControl.cursorToMediaBean(mLocalCursor.cursor,
-                mAsyConfig.mLocalMediaInfoFactory.createMediaInfo());
+        mLocalMediaInfo = mAsyConfig.mUDatabaseControl.cursorToMediaBean(mLocalCursor.cursor,
+                mAsyConfig.mUDatabaseControl.createMediaInfo());
     }
 
     private boolean checkUpdate(MediaInfo localBean, MediaInfo mediaInfo) {

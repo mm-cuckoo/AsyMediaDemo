@@ -21,7 +21,7 @@
         </activity>
 
         <provider
-            android:authorities="com.smartisanos.fve.db"
+            android:authorities="com.cfox.asymedia.db"
             android:name=".db.LocalMediaDatabaseProvider"/>
     </application>
 

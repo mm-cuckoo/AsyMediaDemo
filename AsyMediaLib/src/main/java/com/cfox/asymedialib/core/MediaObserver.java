@@ -8,6 +8,8 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 
+import com.cfox.asymedialib.AsyConfig;
+
 
 public class MediaObserver extends ContentObserver {
     private static final String TAG = "MediaObserver";
@@ -49,6 +51,9 @@ public class MediaObserver extends ContentObserver {
 
     @Override
     public void onChange(boolean selfChange, Uri uri) {
+        if(AsyConfig.isDebug) {
+            Log.d(TAG, "onChange: media provider uri:" + uri.toString());
+        }
         int newPriority = getUriPriority(uri);
         if (newPriority == TYPE_INSERT_IMAGE || newPriority == TYPE_INSERT_VIDEO) {
             dispatchUri(uri);
@@ -85,6 +90,9 @@ public class MediaObserver extends ContentObserver {
     private Runnable postRun = new Runnable() {
         @Override
         public void run() {
+            if(AsyConfig.isDebug) {
+                Log.d(TAG, "run: delay running .....");
+            }
             int tmpFlag = mFlag;
             mFlag = 0;
             postRun(DatabaseSyncHandler.TYPE_FLAG, tmpFlag);

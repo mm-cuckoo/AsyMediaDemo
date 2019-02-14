@@ -12,7 +12,6 @@ import com.cfox.asymedialib.core.engine.MediaEngine;
 import com.cfox.asymedialib.core.engine.MediaProviderEngine;
 
 public class DatabaseSyncHandler {
-    private static final String TAG = "DatabaseSyncHandler";
 
     public static final String SERVICE_KEY      = "service_key";
     public static final String VALUE_KEY        = "value_key";

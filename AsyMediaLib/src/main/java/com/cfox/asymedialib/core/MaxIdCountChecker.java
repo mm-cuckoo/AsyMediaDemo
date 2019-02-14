@@ -6,6 +6,8 @@ import android.net.Uri;
 import android.provider.MediaStore;
 import android.util.Log;
 
+import com.cfox.asymedialib.AsyConfig;
+
 public class MaxIdCountChecker {
 
     private static final String TAG = "MaxIdCountChecker";
@@ -32,8 +34,10 @@ public class MaxIdCountChecker {
                 if (cursor.moveToFirst()) {
                     int max_id = cursor.getInt(0);
                     int count = cursor.getInt(1);
-//                    Log.d(TAG, "check: mMaxId:" + mMaxId + "  max_id:" + max_id +
-//                            "  mCount:" + mCount + "  count:" + count);
+                    if(AsyConfig.isDebug) {
+                        Log.d(TAG, "check: mMaxId:" + mMaxId + "  max_id:" + max_id +
+                                "  mCount:" + mCount + "  count:" + count);
+                    }
                     boolean changed = max_id != mMaxId || count != mCount;
                     mMaxId = max_id;
                     mCount = count;

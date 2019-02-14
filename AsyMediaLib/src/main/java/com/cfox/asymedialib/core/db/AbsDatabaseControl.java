@@ -5,7 +5,6 @@ import android.database.Cursor;
 
 import com.cfox.asymedialib.AsyConfig;
 import com.cfox.asymedialib.core.CursorWrapper;
-import com.cfox.asymedialib.core.MediaInfoFactory;
 import com.cfox.asymedialib.core.MediaInfo;
 
 import java.util.ArrayList;
@@ -13,13 +12,12 @@ import java.util.List;
 
 public abstract class AbsDatabaseControl<T extends MediaInfo> {
 
-    private  List<T> wrapperBean(CursorWrapper cursorWrapper) {
+    public List<T> wrapperToBeans(CursorWrapper cursorWrapper) {
         List<T> list = new ArrayList<>();
-        if (cursorWrapper == null || cursorWrapper.cursor == null) {
+        if (cursorWrapper == null) {
             return list;
         }
         try {
-            cursorWrapper.cursor.moveToFirst();
             do {
                 T t = cursorToMediaBean(cursorWrapper.cursor, AsyConfig.getInstance().mFilterMinImageSize);
                 if (t == null) {
@@ -34,7 +32,7 @@ public abstract class AbsDatabaseControl<T extends MediaInfo> {
     }
 
     public T cursorToMediaBean(Cursor cursor, int imageMinSize) {
-        return cursorToMediaBean(cursor, null, imageMinSize);
+        return cursorToMediaBean(cursor, createMediaInfo(), imageMinSize);
     }
 
     public  T cursorToMediaBean(Cursor cursor, T t) {
@@ -59,5 +57,6 @@ public abstract class AbsDatabaseControl<T extends MediaInfo> {
     public abstract CursorWrapper queryVideoToCursor(Context context, int startId, int rowNum);
     public abstract CursorWrapper queryImageAndVideoToCursor(Context context, int startId, int rowNum);
     public abstract int getMediaId(CursorWrapper cursorWrapper);
+    public abstract T createMediaInfo();
 
 }
