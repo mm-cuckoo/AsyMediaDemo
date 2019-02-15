@@ -2,7 +2,7 @@ package com.cfox.asymediademo.db;
 
 public interface IMediaDbData {
 
-    String AUTHORITY = "com.smartisanos.fve.db";
+    String AUTHORITY = "com.cfox.asymedia.db";
 
     String TABLE_FILES = "files";
 

@@ -5,8 +5,9 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 
-import com.cfox.asymediademo.db.LocalDatabaseControl;
-import com.cfox.asymediademo.db.LocalMediaInfo;
+import com.cfox.asymedialib.core.CursorWrapper;
+import com.cfox.asymedialib.core.MediaInfo;
+import com.cfox.asymedialib.core.db.MediaDatabaseController;
 
 import java.util.List;
 
@@ -25,10 +26,21 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void showLocals(View view) {
-        LocalDatabaseControl control = new LocalDatabaseControl();
-        List<LocalMediaInfo> infos =  control.wrapperToBeans(control.baseQuery(this, null, null, null));
-        for (LocalMediaInfo info : infos) {
-            Log.e(TAG, "Local Info :" + info.toString());
+        CursorWrapper wrapper;
+//        LocalDatabaseController control = new LocalDatabaseController();
+//        wrapper = control.baseQuery(this, null, null, null);
+
+        MediaDatabaseController control = new MediaDatabaseController();
+//        wrapper = control.queryImageAndVideo(this, 0, 1000);
+//        wrapper = control.queryImageAndVideo(this, 31535, 0,31535, 0,0, 1000);
+//        wrapper = control.queryImage(this ,0, 1000);
+//        wrapper = control.queryImage(this, 31535, 0,0, 1000);
+//        wrapper = control.queryVideo(this, 0, 1000);
+        wrapper = control.queryVideo(this, 31535, 0,0, 1000);
+
+        List<MediaInfo> infos =  control.wrapperToBeans(wrapper);
+        for (MediaInfo info : infos) {
+            Log.e(TAG, "media Info :" + info.toString());
         }
 
     }

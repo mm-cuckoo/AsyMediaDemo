@@ -9,7 +9,7 @@ import com.cfox.asymedialib.core.CursorWrapper;
 public class MediaProviderEngine extends MediaEngine {
 
 
-    public MediaProviderEngine(Context mContext, int mediaType) {
+    private MediaProviderEngine(Context mContext, int mediaType) {
         super(mContext, mediaType);
     }
 
@@ -19,18 +19,32 @@ public class MediaProviderEngine extends MediaEngine {
 
 
     @Override
-    public CursorWrapper queryImageToCursor(Context context, int startId, int rowNum) {
-        return AsyConfig.getInstance().mMDatabaseControl.queryImageToCursor(context, startId, rowNum);
+    public CursorWrapper queryImage(Context context, int startMediaId, int rowNum) {
+        return AsyConfig.getInstance().mMDatabaseControl.queryImage(
+                context,
+                AsyConfig.getInstance().mFilterMinImageSize,
+                AsyConfig.getInstance().mFilterMaxImageSize,
+                startMediaId, rowNum);
     }
 
     @Override
-    public CursorWrapper queryVideoToCursor(Context context, int startId, int rowNum) {
-        return AsyConfig.getInstance().mMDatabaseControl.queryVideoToCursor(context, startId, rowNum);
+    public CursorWrapper queryVideo(Context context, int startMediaId, int rowNum) {
+        return AsyConfig.getInstance().mMDatabaseControl.queryVideo(
+                context,
+                AsyConfig.getInstance().mFilterMinVideoSize,
+                AsyConfig.getInstance().mFilterMaxVideoSize,
+                startMediaId, rowNum);
     }
 
     @Override
-    public CursorWrapper queryImageAndVideoToCursor(Context context, int startId, int rowNum) {
-        return AsyConfig.getInstance().mMDatabaseControl.queryImageAndVideoToCursor(context, startId, rowNum);
+    public CursorWrapper queryImageAndVideo(Context context, int startMediaId, int rowNum) {
+        return AsyConfig.getInstance().mMDatabaseControl.queryImageAndVideo(
+                context,
+                AsyConfig.getInstance().mFilterMinImageSize,
+                AsyConfig.getInstance().mFilterMaxImageSize,
+                AsyConfig.getInstance().mFilterMinVideoSize,
+                AsyConfig.getInstance().mFilterMaxVideoSize,
+                startMediaId, rowNum);
     }
 
     @Override

@@ -70,13 +70,13 @@ public class DatabaseControlHandler {
     private void dispatchMsg(Bundle obj) {
 
         int flag = obj.getInt(KEY_FLAG, -1);
-        if(AsyConfig.isDebug) {
+        if(AsyConfig.Debug) {
             Log.d(TAG, "get flag:" + flag);
         }
         MediaInfo info = null;
         if (flag > 0) {
             info = obj.getParcelable(KEY_VALUE);
-            if(AsyConfig.isDebug) {
+            if(AsyConfig.Debug) {
                 Log.d(TAG, "get info:" + info);
             }
         }
@@ -102,7 +102,7 @@ public class DatabaseControlHandler {
                 break;
 
             case FLAG_FLUSH_DELAY:
-                if(AsyConfig.isDebug) {
+                if(AsyConfig.Debug) {
                     Log.d(TAG, ">>>>>>: flush delay data ");
                 }
 
@@ -115,9 +115,12 @@ public class DatabaseControlHandler {
     }
 
     private void flushDeleteDelay(boolean isFlush) {
-        if(AsyConfig.isDebug) {
+        if(AsyConfig.Debug) {
             Log.d(TAG, "delete size:" + mDeletes.size());
-            Log.d(TAG, "mDeletes:" + mDeletes.toString());
+        }
+
+        if (AsyConfig.DEBUG_INFO) {
+            Log.d(TAG, "delete info:" + mDeletes.toString());
         }
 
         if (mDeletes.size() > 0 && (isFlush || mDeletes.size() >= mDeleteStackSize)) {
@@ -127,9 +130,12 @@ public class DatabaseControlHandler {
     }
 
     private void flushUpdateDelay(boolean isFlush) {
-        if(AsyConfig.isDebug) {
+        if(AsyConfig.Debug) {
             Log.d(TAG, "update size:" + mUpdates.size());
-            Log.d(TAG, "updates:" + mUpdates.toString());
+        }
+
+        if (AsyConfig.DEBUG_INFO) {
+            Log.d(TAG, "update info:" + mUpdates.toString());
         }
 
         if (mUpdates.size() > 0 && (isFlush || mUpdates.size() >= mUpdateStackSize)) {
@@ -139,9 +145,12 @@ public class DatabaseControlHandler {
     }
 
     private void flushInsertDelay(boolean isFlush) {
-        if(AsyConfig.isDebug) {
+        if(AsyConfig.Debug) {
             Log.d(TAG, "insert size:" + mInserts.size());
-            Log.d(TAG, "inserts:" + mInserts.toString());
+        }
+
+        if (AsyConfig.DEBUG_INFO) {
+            Log.d(TAG, "insert info:" + mInserts.toString());
         }
         if (mInserts.size() > 0 && (isFlush || mInserts.size() >= mInsertStackSize)) {
             AsyConfig.getInstance().mUDatabaseControl.insertForList(mContext, mInserts);
@@ -151,6 +160,6 @@ public class DatabaseControlHandler {
 
     private void insertNow(MediaInfo bean) {
         if (bean == null) return;
-        AsyConfig.getInstance().mUDatabaseControl.insertOrUpdate(mContext, bean);
+        AsyConfig.getInstance().mUDatabaseControl.insert(mContext, bean);
     }
 }

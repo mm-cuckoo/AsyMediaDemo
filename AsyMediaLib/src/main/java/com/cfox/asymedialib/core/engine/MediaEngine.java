@@ -19,18 +19,18 @@ public abstract class MediaEngine {
     private int mMediaType = 0;
     private  int mRow_num = 0;
 
-    public abstract CursorWrapper queryImageToCursor(Context context, int startId, int rowNum );
-    public abstract CursorWrapper queryVideoToCursor(Context context, int startId, int rowNum );
-    public abstract CursorWrapper queryImageAndVideoToCursor(Context context, int startId, int rowNum );
+    public abstract CursorWrapper queryImage(Context context, int startMediaId, int rowNum );
+    public abstract CursorWrapper queryVideo(Context context, int startMediaId, int rowNum );
+    public abstract CursorWrapper queryImageAndVideo(Context context, int startMediaId, int rowNum );
     public abstract int getMediaId(CursorWrapper cursor);
 
-    public MediaEngine(Context mContext , int mediaType) {
+    MediaEngine(Context mContext, int mediaType) {
         this.mContext = mContext;
         this.mMediaType = mediaType;
         this.mRow_num = AsyConfig.getInstance().mQueryOnceRowNumber;
     }
 
-    public CursorWrapper getMeidaCursor() {
+    CursorWrapper getMediaCursor() {
         if (mCursorWrapper == null) {
             mCursorWrapper = dispatchCursorWrapper(mContext, mMediaId, mRow_num, mMediaType);
             if (mCursorWrapper == null) {
@@ -42,49 +42,54 @@ public abstract class MediaEngine {
 
         if (mCursorWrapper.cursor.moveToNext()) {
             mMediaId = mediaId(mCursorWrapper) + 1;// move to next index
-            if(AsyConfig.isDebug) {
-                Log.d(TAG, "getMeidaCursor >>>> Media id : " + mMediaId);
+            if(AsyConfig.Debug) {
+                Log.d(TAG, "getMediaCursor >>>> Media id : " + mMediaId);
             }
             return mCursorWrapper;
         }
 
         if (mCursorWrapper.cursor.getCount() < mRow_num) {
-            closeCusor();
+            closeCursor();
             return null;
         }
 
         if (mCursorWrapper != null) {
-            closeCusor();
+            closeCursor();
         }
 
         mCursorWrapper = dispatchCursorWrapper(mContext, mMediaId, mRow_num, mMediaType);
         if (mCursorWrapper == null) {
-            closeCusor();
+            closeCursor();
             return null;
         }
         return mCursorWrapper;
     }
 
-    private CursorWrapper dispatchCursorWrapper(Context context, int startId, int rowNum , int type) {
+    private CursorWrapper dispatchCursorWrapper(Context context, int startMediaId, int rowNum , int type) {
 
-        if(AsyConfig.isDebug) {
-            Log.d(TAG, "dispatchCursorWrapper >>> startId:" + startId + " RowNum: " + rowNum +  "  type: " + type);
+        if(AsyConfig.Debug) {
+            Log.d(TAG, "dispatchCursorWrapper >>> startMediaId:" + startMediaId + " RowNum: " + rowNum +  "  type: " + type);
         }
 
         CursorWrapper cursorWrapper;
         switch (type) {
             case TYPE_IMAGE_VIDEO:
-                cursorWrapper = queryImageAndVideoToCursor(context, startId, rowNum);
+                cursorWrapper = queryImageAndVideo(context, startMediaId, rowNum);
                 break;
             case TYPE_IMAGE:
-                cursorWrapper = queryImageToCursor(context, startId, rowNum);
+                cursorWrapper = queryImage(context, startMediaId, rowNum);
                 break;
 
             case TYPE_VIDEO:
-                cursorWrapper = queryVideoToCursor(context, startId, rowNum);
+                cursorWrapper = queryVideo(context, startMediaId, rowNum);
                 break;
             default:
-                cursorWrapper = queryImageAndVideoToCursor(context, startId, rowNum);
+                cursorWrapper = queryImageAndVideo(context, startMediaId, rowNum);
+        }
+        if (cursorWrapper != null) {
+            cursorWrapper.cursor.moveToFirst();
+        } else {
+            Log.i(TAG, "dispatchCursorWrapper: cursorWrapper is null ....");
         }
         return cursorWrapper;
 
@@ -95,7 +100,7 @@ public abstract class MediaEngine {
         return getMediaId(cursorWrapper);
     }
 
-    private void closeCusor() {
+    private void closeCursor() {
         if (mCursorWrapper != null) {
             mCursorWrapper.close();
             mCursorWrapper = null;

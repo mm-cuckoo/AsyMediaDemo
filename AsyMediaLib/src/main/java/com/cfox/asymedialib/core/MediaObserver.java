@@ -51,7 +51,7 @@ public class MediaObserver extends ContentObserver {
 
     @Override
     public void onChange(boolean selfChange, Uri uri) {
-        if(AsyConfig.isDebug) {
+        if(AsyConfig.Debug) {
             Log.d(TAG, "onChange: media provider uri:" + uri.toString());
         }
         int newPriority = getUriPriority(uri);
@@ -90,7 +90,7 @@ public class MediaObserver extends ContentObserver {
     private Runnable postRun = new Runnable() {
         @Override
         public void run() {
-            if(AsyConfig.isDebug) {
+            if(AsyConfig.Debug) {
                 Log.d(TAG, "run: delay running .....");
             }
             int tmpFlag = mFlag;

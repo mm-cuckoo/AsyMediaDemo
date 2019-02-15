@@ -8,7 +8,7 @@ import android.util.Log;
 
 import com.cfox.asymedialib.AsyConfig;
 
-public class MaxIdCountChecker {
+class MaxIdCountChecker {
 
     private static final String TAG = "MaxIdCountChecker";
 
@@ -17,7 +17,7 @@ public class MaxIdCountChecker {
 
     private static final Uri MEDIA_URI = MediaStore.Files.getContentUri("external");
 
-    public static boolean check(Context context) {
+    static boolean check(Context context) {
         final String[] projection = {"MAX(_id), COUNT(*)"};
         final String where = MediaStore.Files.FileColumns.MEDIA_TYPE + "=? OR " +
                 MediaStore.Files.FileColumns.MEDIA_TYPE + "=?";
@@ -34,7 +34,7 @@ public class MaxIdCountChecker {
                 if (cursor.moveToFirst()) {
                     int max_id = cursor.getInt(0);
                     int count = cursor.getInt(1);
-                    if(AsyConfig.isDebug) {
+                    if(AsyConfig.Debug) {
                         Log.d(TAG, "check: mMaxId:" + mMaxId + "  max_id:" + max_id +
                                 "  mCount:" + mCount + "  count:" + count);
                     }

@@ -2,20 +2,25 @@ package com.cfox.asymedialib;
 
 import android.content.Context;
 
-import com.cfox.asymedialib.core.db.AbsMDatabaseControl;
-import com.cfox.asymedialib.core.db.AbsUDatabaseControl;
+import com.cfox.asymedialib.core.db.AbsMDatabaseController;
+import com.cfox.asymedialib.core.db.AbsUDatabaseController;
 import com.cfox.asymedialib.core.CheckRule;
 
 public class AsyConfig {
 
-    public static boolean isDebug = false;
+    public final static boolean DEBUG_INFO = false;
+    public static boolean Debug = false;
+
     private static AsyConfig config = new AsyConfig();
     public Context mContext;
-    public AbsMDatabaseControl mMDatabaseControl;
-    public AbsUDatabaseControl mUDatabaseControl;
+    public AbsMDatabaseController mMDatabaseControl;
+    public AbsUDatabaseController mUDatabaseControl;
     public CheckRule checkRule;
     public int mQueryOnceRowNumber;
     public int mFilterMinImageSize;
+    public int mFilterMaxImageSize;
+    public int mFilterMinVideoSize;
+    public int mFilterMaxVideoSize;
     public int mCacheSizeInsert;
     public int mCacheSizeUpdate;
     public int mCacheSizeDelete;
@@ -29,6 +34,9 @@ public class AsyConfig {
         return "AsyConfig{" +
                 "mQueryOnceRowNumber=" + mQueryOnceRowNumber +
                 ", mFilterMinImageSize=" + mFilterMinImageSize +
+                ", mFilterMaxImageSize=" + mFilterMaxImageSize +
+                ", mFilterMinVideoSize=" + mFilterMinVideoSize +
+                ", mFilterMaxVideoSize=" + mFilterMaxVideoSize +
                 ", mCacheSizeInsert=" + mCacheSizeInsert +
                 ", mCacheSizeUpdate=" + mCacheSizeUpdate +
                 ", mCacheSizeDelete=" + mCacheSizeDelete +

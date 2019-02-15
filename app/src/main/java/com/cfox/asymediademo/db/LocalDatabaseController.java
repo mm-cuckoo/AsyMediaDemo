@@ -11,20 +11,19 @@ import android.os.RemoteException;
 import android.util.Log;
 
 import com.cfox.asymedialib.core.MediaInfo;
-import com.cfox.asymedialib.core.db.AbsUDatabaseControl;
+import com.cfox.asymedialib.core.db.AbsUDatabaseController;
 import com.cfox.asymedialib.core.CursorWrapper;
 
 import java.util.ArrayList;
 import java.util.List;
 
 
-public class LocalDatabaseControl extends AbsUDatabaseControl<LocalMediaInfo> {
-    private static final String TAG = "LocalDatabaseControl";
+public class LocalDatabaseController extends AbsUDatabaseController<LocalMediaInfo> {
+    private static final String TAG = "LocalDatabaseController";
 
     private static Uri mFileUri = Uri.parse("content://" + IMediaDbData.AUTHORITY + "/" + IMediaDbData.TABLE_FILES);
 
-    @Override
-    public CursorWrapper baseQuery(Context context, String where, String[] whereArgs, String sortOrder) {
+    private CursorWrapper baseQuery(Context context, String where, String[] whereArgs, String sortOrder) {
         ContentResolver resolver = context.getContentResolver();
         Cursor cursor = resolver.query(mFileUri, new String[]{IMediaDbData.MEDIA_ID, IMediaDbData.FILE_PATH},
                 where, whereArgs, sortOrder);
@@ -32,26 +31,25 @@ public class LocalDatabaseControl extends AbsUDatabaseControl<LocalMediaInfo> {
     }
 
     @Override
-    public CursorWrapper queryImageToCursor(Context context, int startId, int rowNum) {
-        String where = IMediaDbData.TYPE + " = ?";
-        String[] whereArgs = new String[]{"1"};
+    public CursorWrapper queryImage(Context context, int startMediaId, int rowNum) {
+        String where = IMediaDbData.TYPE + " = ? AND " + IMediaDbData.MEDIA_ID + " >= ?";
+        String[] whereArgs = new String[]{"1", String.valueOf(startMediaId)};
         String sortOrder = IMediaDbData.ID + " ASC  LIMIT " + rowNum;
         return baseQuery(context, where, whereArgs, sortOrder);
     }
 
     @Override
-    public CursorWrapper queryVideoToCursor(Context context, int startId, int rowNum) {
-        String where = IMediaDbData.TYPE + " = ?";
-        String[] whereArgs = new String[]{"0"};
+    public CursorWrapper queryVideo(Context context, int startMediaId, int rowNum) {
+        String where = IMediaDbData.TYPE + " = ? AND " + IMediaDbData.MEDIA_ID + " >= ?";
+        String[] whereArgs = new String[]{"0", String.valueOf(startMediaId)};
         String sortOrder = IMediaDbData.ID + " ASC  LIMIT " + rowNum;
         return baseQuery(context, where, whereArgs, sortOrder);
     }
 
     @Override
-    public CursorWrapper queryImageAndVideoToCursor(Context context, int startId, int rowNum) {
-
+    public CursorWrapper queryImageAndVideo(Context context, int startMediaId, int rowNum) {
         String where = IMediaDbData.MEDIA_ID + " >= ?";
-        String[] whereArgs = {String.valueOf(startId)};
+        String[] whereArgs = {String.valueOf(startMediaId)};
         String sortOrder = IMediaDbData.MEDIA_ID + " ASC  LIMIT " + rowNum;
 
         return baseQuery(context, where, whereArgs, sortOrder);
@@ -123,9 +121,9 @@ public class LocalDatabaseControl extends AbsUDatabaseControl<LocalMediaInfo> {
     }
 
     @Override
-    public void insertOrUpdate(Context context, MediaInfo mediaInfo) {
+    public void insert(Context context, MediaInfo mediaInfo) {
         boolean isInsert;
-        Log.d(TAG, "insertOrUpdate: id:" + mediaInfo.getId() + "  path:" + mediaInfo.getPath());
+        Log.d(TAG, "insert: id:" + mediaInfo.getId() + "  path:" + mediaInfo.getPath());
         String[] mediaId = new String[]{String.valueOf(mediaInfo.getId())};
         ContentResolver resolver = context.getContentResolver();
         Cursor cursor = resolver.query(mFileUri, null, IMediaDbData.MEDIA_ID + " = ?",
@@ -162,7 +160,7 @@ public class LocalDatabaseControl extends AbsUDatabaseControl<LocalMediaInfo> {
     }
 
     @Override
-    public LocalMediaInfo cursorToMediaBean(Cursor cursor, LocalMediaInfo localMediaInfo, int minSize) {
+    public LocalMediaInfo cursorToMediaInfo(Cursor cursor, LocalMediaInfo localMediaInfo) {
         if (cursor == null || localMediaInfo == null) return null;
         int mediaId = cursor.getInt(cursor.getColumnIndex(IMediaDbData.MEDIA_ID));
         String filePath = cursor.getString(cursor.getColumnIndex(IMediaDbData.FILE_PATH));
