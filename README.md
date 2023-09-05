@@ -7,8 +7,6 @@
 3. 当媒体库中图片和视频信息非常庞大的时，同步不会造成OOM
 4. 可以设置同步图片和视频的大小范围
 
-[AsyMediaLib Github 地址 (https://github.com/MrChao1991/AsyMediaDemo)](https://github.com/MrChao1991/AsyMediaDemo)
-
    
 ### 使用方法
 #### 将`AsyMediaLib` 添加到工程中
